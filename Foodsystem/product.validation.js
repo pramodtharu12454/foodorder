@@ -1,12 +1,13 @@
 // product.validation.js
-import Joi from "joi";
+import * as yup from "yup";
 
-export const productSchema = Joi.object({
-  name: Joi.string().max(255).required(),
-  price: Joi.number().min(0).required(),
-  quantity: Joi.number().min(1).required(),
-  category: Joi.string()
-    .valid(
+export const productSchema = yup.object({
+  name: yup.string().max(255).required(),
+  price: yup.number().min(0).required(),
+  quantity: yup.number().min(1).required(),
+  category: yup
+    .string()
+    .oneOf([
       "french fries",
       "Samosa",
       "Chaumin",
@@ -16,9 +17,9 @@ export const productSchema = Joi.object({
       "paneer",
       "nan",
       "pakoda",
-      "fruits slaad"
-    )
+      "fruit salad",
+    ])
     .required(),
-  description: Joi.string().min(10).max(1000).required(),
-  image: Joi.string().uri().optional(),
+  image: yup.string().nullable(),
+  description: yup.string().min(10).max(1000).required(),
 });

@@ -1,6 +1,6 @@
 import express from "express";
 import { productSchema } from "./product.validation.js";
-import ProductTable from "./product.model.js";
+import Product from "../models/product.model.js";
 import { isAdmin, isUser } from "../middleware/authentication.middleware.js";
 import { validateMongoIdFromReqParams } from "../middleware/validate.mongo.id.js";
 import validateReqBody from "../middleware/validate.reqbody.middleware.js";
@@ -16,7 +16,7 @@ router.post(
   async (req, res) => {
     const newProduct = req.body;
     const AdminId = req.loggedInUserId;
-    await ProductTable.create({ ...newProduct, AdminId });
+    await Product.create({ ...newProduct, AdminId });
     return res.status(201).send({ message: "Food added successfully." });
   }
 );
@@ -28,7 +28,7 @@ router.get(
   validateMongoIdFromReqParams,
   async (req, res) => {
     const productId = req.params.id;
-    const product = await ProductTable.findOne({ _id: productId });
+    const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).send({ message: "Food not found." });
     }
@@ -44,12 +44,8 @@ router.post(
   async (req, res) => {
     const { limit, page } = req.body;
     const skip = (page - 1) * limit;
-    const products = await ProductTable.aggregate([
-      { $match: {} },
-      { $skip: skip },
-      { $limit: limit },
-    ]);
-    const totalItems = await ProductTable.countDocuments();
+    const products = await Product.find({}).skip(skip).limit(limit);
+    const totalItems = await Product.countDocuments();
     const totalPage = Math.ceil(totalItems / limit);
     return res
       .status(200)
@@ -64,7 +60,7 @@ router.delete(
   validateMongoIdFromReqParams,
   async (req, res) => {
     const productId = req.params.id;
-    const product = await ProductTable.findOne({ _id: productId });
+    const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).send({ message: "Food not found." });
     }
@@ -73,7 +69,7 @@ router.delete(
     if (!isOwner) {
       return res.status(403).send({ message: "Unauthorized action." });
     }
-    await ProductTable.deleteOne({ _id: productId });
+    await Product.deleteOne({ _id: productId });
     return res.status(200).send({ message: "Food deleted successfully." });
   }
 );
@@ -87,7 +83,7 @@ router.put(
   async (req, res) => {
     const productId = req.params.id;
     const updatedData = req.body;
-    await ProductTable.updateOne({ _id: productId }, { $set: updatedData });
+    await Product.updateOne({ _id: productId }, { $set: updatedData });
     return res.status(200).send({ message: "Food updated successfully." });
   }
 );

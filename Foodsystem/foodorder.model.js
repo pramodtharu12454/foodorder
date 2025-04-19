@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { productSchema } from "./product.validation";
 
-const productSchema = new mongoose.Schema(
+const ProductSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -32,7 +33,7 @@ const productSchema = new mongoose.Schema(
         "paneer",
         "nan",
         "pakoda",
-        "fruits slaad",
+        "fruit salad", // fixed typo
       ],
     },
     image: {
@@ -57,7 +58,7 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-const ProductTable =
+const Product =
   mongoose.models.Product || mongoose.model("Product", productSchema);
 
-export default ProductTable;
+export default Product;
